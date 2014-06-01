@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+<id>Category Information Page</id>
+<version>1.0</version>
+<vqmver>2.2.4</vqmver>
+<author>mithereal</author>
+<file name="admin/controller/catalog/category.php">
+<operation>
+<search position="before"><![CDATA[
+if (isset($this->request->post['path'])) {
+]]></search>
+
+<add><![CDATA[
+//start category_infopages
+$this->load->model('catalog/information');
+$infopages = $this->model_catalog_information->getInformations();
+$informations = $this->model_catalog_category->getCategoryInformation((int)$this->request->get['category_id']);
+
+if(isset($informations['information_id'])){
+$this->data['information_id'] = $informations['information_id'];
+}
+$this->data['infopages'] = $infopages;
+//end category_infopages
+]]></add>
+
+</operation>
+</file>
+<file name="admin/model/catalog/category.php">
+<operation>
+<search position="before"><![CDATA[
+// Set which layout to use with this category
+]]></search>
+
+<add><![CDATA[//start category_infopages
+if (isset($data['information_id'])) {
+$this->db->query("INSERT INTO " . DB_PREFIX . "information_to_category SET category_id='" . (int)$category_id . "', information_id = '" . (int)$data['information_id'] . "'");
+}
+//end category_infopages
+]]></add>
+
+</operation>
+</file>
+<file name="admin/model/catalog/category.php">
+<operation>
+<search position="after"><![CDATA[
+		$this->db->query("UPDATE " . DB_PREFIX . "category SET parent_id = '" . (int)$data['parent_id'] . "', `top` = '" . (isset($data['top']) ? (int)$data['top'] : 0) . "', `column` = '" . (int)$data['column'] . "', sort_order = '" . (int)$data['sort_order'] . "', status = '" . (int)$data['status'] . "', date_modified = NOW() WHERE category_id = '" . (int)$category_id . "'");
+
+]]></search>
+
+<add><![CDATA[//start category_infopages
+if (isset($data['information_id'])) {
+$query = $this->db->query("DELETE FROM " . DB_PREFIX . "information_to_category WHERE category_id = '" . (int)$category_id . "'");
+$this->db->query("INSERT INTO " . DB_PREFIX . "information_to_category SET category_id='" . (int)$category_id . "', information_id = '" . (int)$data['information_id'] . "'");
+}
+//end category_infopages
+]]></add>
+
+</operation>
+</file>
+<file name="admin/model/catalog/category.php">
+<operation>
+<search position="before"><![CDATA[// Function to repair any erroneous categories that are not in the category path table.]]></search>
+
+<add><![CDATA[
+//start category_infopages
+public function getCategoryInformation($category_id) {
+$category_layout_data = array();
+
+$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "information_to_category WHERE category_id = '" . (int)$category_id . "'");
+
+return $query->row;
+}
+//end of category_infopages
+]]></add>
+
+</operation>
+</file>
+<file name="admin/view/template/catalog/category_form.tpl">
+<operation>
+<search position="before"><![CDATA[
+<td><?php echo $entry_store; ?></td>
+]]></search>
+
+<add><![CDATA[
+
+<tr>
+<td>Categorys Information Page</td>
+<td><select name="information_id" >
+<option value="NULL"><?php echo $text_none; ?></option>
+<?php 
+foreach ($infopages as $page) {
+ ?>
+<?php if (isset($information_id) && $information_id == $page['information_id']) { ?>
+<option value="<?php echo $page['information_id']; ?>" selected="selected"><?php echo $page['title']; ?></option>
+<?php } else { ?>
+<option value="<?php echo $page['information_id']; ?>"><?php echo $page['title']; ?></option>
+
+<?php } ?>
+<?php } ?>
+</select></td>
+</tr>
+
+]]></add>
+
+</operation>
+</file>
+
+<file name="catalog/model/catalog/category.php">
+<operation>
+<search position="before"><![CDATA[public function getCategoryLayoutId($category_id) {]]></search>
+
+<add><![CDATA[
+//start category_infopages
+public function getCategoryInformation($category_id) {
+$category_layout_data = array();
+
+$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "information_to_category WHERE category_id = '" . (int)$category_id . "'");
+
+return $query->row;
+}
+//end of category_infopages
+]]></add>
+
+</operation>
+</file>
+
+<file name="catalog/controller/product/category.php">
+<operation>
+<search position="after"><![CDATA[
+$this->load->model('tool/image'); 
+]]></search>
+
+<add><![CDATA[
+//start of category_infopages
+$this->language->load('information/information');
+$this->load->model('catalog/information');
+//end of category_infopages
+]]></add>
+
+</operation>
+</file>
+
+<file name="catalog/controller/product/category.php">
+<operation>
+<search position="before"><![CDATA[
+$this->data['products'][] = array(
+]]></search>
+
+<add><![CDATA[
+//start of category_infopages
+
+$informations = $this->model_catalog_category->getCategoryInformation($category_id);
+if(isset($informations['information_id'])){
+$this->data['information_id'] = $informations['information_id'];
+$information_info = $this->model_catalog_information->getInformation($this->data['information_id']); 
+}
+if(isset($information_info['description']))
+$this->data['information_info'] = html_entity_decode($information_info['description'], ENT_QUOTES, 'UTF-8');
+
+//end of category_infopages
+
+
+]]></add>
+
+</operation>
+</file>
+
+<file name="catalog/view/theme/*/template/product/category.tpl">
+<operation>
+<search position="before"><![CDATA[
+<?php if ($categories) { ?>
+]]></search>
+
+<add><![CDATA[
+<div class="category-info">
+<?php 
+if(isset($information_info))
+echo $information_info; 
+?>
+</div>
+]]></add>
+
+</operation>
+</file>
+
+
+</modification>
+
