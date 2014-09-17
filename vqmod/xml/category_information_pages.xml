@@ -3,52 +3,97 @@
 	<version>1.0</version>
 	<vqmver>1.2.3</vqmver>
 	<author>mithereal</author>
-	<file name="admin\controller\catalog\category.php">
+	<file name="admin/controller/catalog/category.php">
 		<operation>
 			<search position="before"><![CDATA[
                         if (isset($this->request->post['path'])) {
                         ]]></search>
                         
                         <add><![CDATA[
-                        //start cat infopages
+                        //start cat infopages mod
 						$this->load->model('catalog/information');
                         $infopages = $this->model_catalog_information->getInformations();
                         $this->data['infopages'] = $infopages;
-                        //end cat infopages
+                        //end cat infopages mod
                         ]]></add>
 
 		</operation>
 	</file>
 	
-	<file name="admin\controller\catalog\category.php">
+	<file name="admin/controller/catalog/category.php">
+		<operation>
+			<search position="after"><![CDATA[
+                        $this->data['layouts'] = $this->model_design_layout->getLayouts();
+                        ]]></search>
+                       
+                        <add><![CDATA[//start of cat infopages mod
+			$this->data['information_id'] = $this->model_catalog_information->getCategoryinformations($this->request->get['category_id']);
+		 
+//end of cat infopages mod
+                        ]]></add>
+
+		</operation>
+	</file>
+	
+	<file name="admin/model/catalog/category.php">
 		<operation>
 			<search position="before"><![CDATA[
-                        // Set which layout to use with this category
+                        if (isset($data['image'])) {
                         ]]></search>
                         
-                        <add><![CDATA[//start of con-cor mod
-		if ($data['information_id']) {
-			$this->db->query("INSERT INTO " . DB_PREFIX . "information_to_category SET category_id='" . (int)$category_id . "', information_id = '" . (int)$data['information_id'] . "'");
+                        <add><![CDATA[//start of cat infopages mod
+		if (isset($data['information_id'])) {
+		
+			$exists=$this->db->query("SELECT information_id FROM " . DB_PREFIX . "information_to_category WHERE category_id ='" . (int)$category_id . "'");
+				
+			if($exists->num_rows == 0){
+						$this->db->query("INSERT INTO " . DB_PREFIX . "information_to_category SET information_id = '" . (int)$data['information_id'] . "', category_id = '" . (int)$category_id . "'");
+
+			}
+			
+			$this->db->query("UPDATE " . DB_PREFIX . "information_to_category SET information_id = '" . (int)$data['information_id'] . "' WHERE category_id = '" . (int)$category_id . "'");
+			
 		}
-//end of con-cor mod
+						//end of cat infopages mod
                         ]]></add>
 
 		</operation>
 	</file>
 	
-	<file name="admin\controller\catalog\category.php">
+	<file name="admin/model/catalog/information.php">
+		<operation>
+			<search position="before"><![CDATA[
+                       public function editInformation($information_id, $data) {
+                        ]]></search>
+                        
+                        <add><![CDATA[//start of cat infopages mod
+		public function getCategoryinformations($category_id){
+		$information=$this->db->query("SELECT information_id FROM " . DB_PREFIX . "information_to_category WHERE category_id ='" . (int)$category_id . "'");
+		
+		return $information->row['information_id'];
+			
+		}
+						//end of cat infopages mod
+                        ]]></add>
+
+		</operation>
+	</file>
+	
+	<file name="admin/view/template/catalog/category_form.tpl">
 		<operation>
 			<search position="before"><![CDATA[
 			<td><?php echo $entry_store; ?></td>
                         ]]></search>
                         
-                        <add><![CDATA[//start of con-cor mod
+                        <add><![CDATA[<!-- start of cat infopages mod -->
 		<tr>
+		
               <td>Categorys Information Page</td>
               <td><select name="information_id">
                   <option value="NULL"><?php echo $text_none; ?></option>
-                  <?php foreach ($infopages as $page) { ?>
-                  <?php if ($information_id['information_id'] == $page['information_id']) { ?>
+                  <?php 
+                  foreach ($infopages as $page) { ?>
+                  <?php if ($information_id == $page['information_id']) { ?>
                   <option value="<?php echo $page['information_id']; ?>" selected="selected"><?php echo $page['title']; ?></option>
                   <?php } else { ?>
                   <option value="<?php echo $page['information_id']; ?>"><?php echo $page['title']; ?></option>
@@ -56,17 +101,19 @@
                   <?php } ?>
                 </select></td>
             </tr>
-//end of con-cor mod]]></add>
+<!-- end of cat infopages mod -->]]></add>
 
 		</operation>
 	</file>
 	
-	<file name="catalog\model\catalog\category.php">
+	<file name="catalog/model/catalog/category.php">
 		<operation>
-			<search position="before" offset="2"><![CDATA[?>]]></search>
+			<search position="before"><![CDATA[
+				public function getCategory($category_id) {
+				]]></search>
                         
                         <add><![CDATA[
-                        //start of con-cor mod
+                        //start of cat infopages mod
 public function getCategoryInformation($category_id) {
 		$category_layout_data = array();
 		
@@ -74,12 +121,12 @@ public function getCategoryInformation($category_id) {
 		
 		return $query->row;
 	}
-//end of con-cor mod]]></add>
+//end of cat infopages mod]]></add>
 
 		</operation>
 	</file>
 	
-	<file name="catalog\controller\product\category.php">
+	<file name="catalog/controller/product/category.php">
 		<operation>
 			<search position="after"><![CDATA[
 			$this->load->model('tool/image'); 
@@ -87,6 +134,7 @@ public function getCategoryInformation($category_id) {
                         
                         <add><![CDATA[
                         //start of category information page mod
+                        $this->document->addStyle('catalog/view/theme/default/stylesheet/category_information_page.css');
 						$this->language->load('information/information');
 		$this->load->model('catalog/information');
 						//end of category information page mod
@@ -95,7 +143,7 @@ public function getCategoryInformation($category_id) {
 		</operation>
 	</file>
 	
-	<file name="catalog\controller\product\category.php">
+	<file name="catalog/controller/product/category.php">
 		<operation>
 			<search position="before"><![CDATA[
 			$this->data['products'][] = array(
@@ -118,20 +166,21 @@ public function getCategoryInformation($category_id) {
 		</operation>
 	</file>
 	
-	<file name="catalog\model\catalog\product.php">
+	<file name="catalog/view/theme/*/template/product/category.tpl">
 		<operation>
-			<search position="before" offset="2"><![CDATA[?>]]></search>
+			<search position="before"><![CDATA[
+				<div class="product-list">
+				]]></search>
                         
-                        <add><![CDATA[//start of category information page mod
-		
-public function getCategoryInformation($category_id) {
-		$category_layout_data = array();
-		
-		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "information_to_category WHERE category_id = '" . (int)$category_id . "'");
-		
-		return $query->row;
-	}
-//end of category information page mod]]></add>
+                        <add><![CDATA[<!-- start of category information page mod -->
+		<div class="category-infomation">
+		<?php if(isset($information_info))
+		{
+		echo $information_info;
+		}
+		?>
+		</div>
+<!--end of category information page mod -->]]></add>
 
 		</operation>
 	</file>

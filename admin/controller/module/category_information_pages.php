@@ -1,20 +1,22 @@
 <?php
-class ControllerModulecategoryinformationpages extends Controller {
+class ControllerModulecategory_information_pages extends Controller {
 	private $error = array(); 
 	
 	public function index() {
-$this->redirect($this->url->link('extension/module', 'token=' . $this->session->data['token'], 'SSL'));
+		$this->language->load('module/category_information_pages');
+
+		$this->document->setTitle($this->language->get('heading_title'));
+		
 	}
 	
 	public function install() {
-		$this->load->model('setting/setting');
-		$query = $this->db->query("CREATE TABLE IF NOT EXISTS " . DB_PREFIX . "information_to_category (category_id INT(11) , information_id INT(11))");
+		$query = $this->db->query("CREATE TABLE IF NOT EXISTS " . DB_PREFIX . "information_to_category (category_id INT(11) , information_id INT(11), PRIMARY KEY (category_id))");
 
 	}
 	
 	public function uninstall() {
-		$this->load->model('setting/setting');
-		$query = $this->db->query("DROP TABLE IF EXISTS information_to_category;
+		$query = $this->db->query("
+		DROP TABLE IF EXISTS information_to_category;
 		");
 	 }
 	 
