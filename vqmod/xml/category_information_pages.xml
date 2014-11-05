@@ -153,7 +153,7 @@ public function getCategoryInformation($category_id) {
 					//start of category information page mod
 
 			$informations = $this->model_catalog_category->getCategoryInformation($category_id);
-			if(isset($informations)){
+			if(isset($informations['information_id'])){
 			$this->data['information_id'] = $informations['information_id'];
 			if(isset($this->data['information_id'])){
 			$this->data['information_id'] = $informations['information_id'];
