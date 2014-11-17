@@ -27,7 +27,9 @@
                         ]]></search>
                        
                         <add><![CDATA[//start of cat infopages mod
+							if(isset($this->request->get['category_id'])){
 			$this->data['information_id'] = $this->model_catalog_information->getCategoryinformations($this->request->get['category_id']);
+			}
 		 
 //end of cat infopages mod
                         ]]></add>
@@ -69,8 +71,11 @@
                         <add><![CDATA[//start of cat infopages mod
 		public function getCategoryinformations($category_id){
 		$information=$this->db->query("SELECT information_id FROM " . DB_PREFIX . "information_to_category WHERE category_id ='" . (int)$category_id . "'");
-		
-		return $information->row['information_id'];
+		$informationid=null;
+		if(isset($information->row['information_id'])){
+		$informationid=$information->row['information_id'];
+		}
+		return $informationid;
 			
 		}
 						//end of cat infopages mod
