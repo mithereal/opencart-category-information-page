@@ -1,10 +1,10 @@
 <?php
 // Heading
-$_['heading_title']       = 'category information pages'; 
+$_['heading_title']       = 'Category Information Pages';
 
 // Text
 $_['text_module']         = 'Modules';
-$_['text_success']        = 'Success: You have modified module ategory information pages!';
+$_['text_success']        = 'Success: You have modified module Category information pages!';
 $_['text_content_top']    = 'Content Top';
 $_['text_content_bottom'] = 'Content Bottom';
 $_['text_column_left']    = 'Column Left';
@@ -21,5 +21,5 @@ $_['entry_success']    = 'Successfully Installed:';
 $_['entry_description']    = 'To Create Information Pages add them to the informations section, there will be a select option in the Category Selection >> category >> edit >> Data';
 
 // Error
-$_['error_permission']    = 'Warning: You do not have permission to modify module ategory information pages!';
+$_['error_permission']    = 'Warning: You do not have permission to modify module Category information pages!';
 ?>

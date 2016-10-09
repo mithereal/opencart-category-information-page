@@ -1,4 +1,4 @@
 category information pages
 ===========
 
-category information pages gives a block of information per category
+category information pages places a user configurable block of information per category.
