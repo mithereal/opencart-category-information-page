@@ -1,9 +1,9 @@
 <?php
-class ControllerModulecategoryinformationpages extends Controller {
+class ControllerExtensionModulecategoryinformationpages extends Controller {
 	private $error = array(); 
 	
 	public function index() {
-		$this->language->load('module/category_information_pages');
+		$this->load->language('module/extension/category_information_pages');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 		$this->data['breadcrumbs'] = array();
@@ -22,7 +22,7 @@ class ControllerModulecategoryinformationpages extends Controller {
 
    		$this->data['breadcrumbs'][] = array(
        		'text'      => $this->language->get('heading_title'),
-			'href'      => $this->url->link('module/category_information_pages', 'token=' . $this->session->data['token'], 'SSL'),
+			'href'      => $this->url->link('module/extension/category_information_pages', 'token=' . $this->session->data['token'], 'SSL'),
       		'separator' => ' :: '
    		);
    		$this->data['heading_title'] = $this->language->get('heading_title');
@@ -31,7 +31,7 @@ class ControllerModulecategoryinformationpages extends Controller {
 		$this->data['entry_success'] = $this->language->get('entry_success');
 		$this->data['entry_description'] = $this->language->get('entry_description');
 		
-		$this->template = 'module/category_information_pages.tpl';
+		$this->template = 'module/extension/category_information_pages.tpl';
 		$this->children = array(
 			'common/header',
 			'common/footer'
@@ -53,7 +53,7 @@ class ControllerModulecategoryinformationpages extends Controller {
 	 }
 	 
 	protected function validate() {
-		if (!$this->user->hasPermission('modify', 'module/category_information_pages')) {
+		if (!$this->user->hasPermission('modify', 'module/extension/category_information_pages')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 		
